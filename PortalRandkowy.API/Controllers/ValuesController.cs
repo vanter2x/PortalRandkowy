@@ -1,5 +1,8 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using PortalRandkowy.API.Data;
+using PortalRandkowy.API.Models;
 
 namespace PortalRandkowy.API.Controllers
 {
@@ -7,36 +10,70 @@ namespace PortalRandkowy.API.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        private readonly DataContext _context;
+        
+        public ValuesController(DataContext context)
+        {
+            _context = context;
+        }
+        
         // GET api/values
         [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public IActionResult GetValues()
         {
-            return new string[] { "value1", "value2" };
+            var values = _context.Values.ToList();
+
+            return Ok(values);
         }
 
         // GET api/values/5
         [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        public IActionResult GetValue(int id)
         {
-            return "value";
+            var value = _context.Values.FirstOrDefault(x => x.Id == id);
+
+            return Ok(value);
         }
 
         // POST api/values
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IActionResult AddValue([FromBody] Value value)
         {
+            _context.Values.Add(value);
+            _context.SaveChanges();
+
+            return Ok(value);
         }
 
         // PUT api/values/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public IActionResult EditValue(int id, [FromBody] Value value)
         {
+            var data = _context.Values.Find(id);
+
+            if(data == null)
+                return NoContent();
+
+            data.Name = value.Name;
+            _context.Values.Update(data);
+            _context.SaveChanges();
+
+            return Ok(data);
         }
 
         // DELETE api/values/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public IActionResult DeleteValue(int id)
         {
+            var data = _context.Values.Find(id);
+
+            if(data == null)
+                return NoContent();
+
+            _context.Values.Remove(data);
+            _context.SaveChanges();
+
+            return Ok(data);
         }
     }
 }
