@@ -6,7 +6,7 @@ using PortalRandkowy.API.Models;
 
 namespace PortalRandkowy.API.Controllers {
     [Route ("api/[controller]")]
-    [ApiController]
+    //[ApiController]
     public class AuthController : ControllerBase {
         private readonly IAuthRepository _repository;
 
